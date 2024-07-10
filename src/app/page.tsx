@@ -1,13 +1,21 @@
 'use client';
-import { getGames } from "@/services/game"
+import { IGame } from "@/types";
 import { useState } from "react";
+// eslint-disable @next/next/no-img-element
 
 export default function Home() {
-  const [games, setGames] = useState([])
+  const [games, setGames] = useState([] as IGame[])
+  const [search, setSearch] = useState('');
 
   const handleGetGames = async () => {
     try {
-      const resp = await fetch('/api/games')
+
+      const resp = await fetch('/api/games/search', {
+        method: 'POST',
+        body: JSON.stringify({
+          search
+        })
+      })
       const { data } = await resp.json()
       console.log(data)
       setGames(data)
@@ -20,6 +28,8 @@ export default function Home() {
     <main>
       <input
         type="text"
+        value={search}
+        onChange={e => { setSearch(e.currentTarget.value) }}
       />
       <button
         onClick={handleGetGames}
@@ -29,6 +39,10 @@ export default function Home() {
           <div
             key={g.id}
           >
+            <img
+              src={`//images.igdb.com/igdb/image/upload/t_cover_big/${g.cover?.image_id}.jpg`}
+              alt="game-cover"
+            />
             { g.name }
           </div>
         )
